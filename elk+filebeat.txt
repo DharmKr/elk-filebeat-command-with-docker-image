@@ -1,0 +1,78 @@
+docker pull docker.elastic.co/beats/filebeat:7.14.1
+
+docker pull docker.elastic.co/kibana/kibana:7.14.1
+
+docker pull docker.elastic.co/logstash/logstash:7.14.1
+
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+
+docker run -p 9200:9200 -p 9300:9300 --name elasticsearch --net elknetwork -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+
+docker run --name kibana --net elknetwork -p 5601:5601 docker.elastic.co/kibana/kibana:7.14.1
+
+docker run --name logstash --link elasticsearch --link kibana docker.elastic.co/logstash/logstash:7.14.1
+
+docker run docker.elastic.co/beats/filebeat:7.14.1 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["localhost:9200"]
+
+docker network create elknetwork
+
+
+docker run --net elknetwork docker.elastic.co/beats/filebeat:7.14.1 setup -E setup.kibana.host=http://kibana:5601 -E output.elasticsearch.hosts=["http://elasticsearch:9200"]
+
+docker run -d --volumes-from mynginx -v /config-dir/filebeat.yml:/usr/share/filebeat/filebeat.yml --name myfilebeat --net elknetwork docker.elastic.co/beats/filebeat:7.14.1
+docker pull elasticsearch:8.3.2
+
+docker run -p 80:80 --name mynginx --net elknetwork mynginx
+
+/home/adminuser
+
+/var/lib/docker/overlay2/be198b0b5b0ba13ac1a3a6620e82bd937675bde4206ab984f52dc3d22adccfb8/merged/usr/share/filebeat/filebeat.yml
+
+docker run -d --volumes-from mynginx -v /var/lib/docker/overlay2/be198b0b5b0ba13ac1a3a6620e82bd937675bde4206ab984f52dc3d22adccfb8/merged/usr/share/filebeat/filebeat.yml --name myfilebeat --net elknetwork docker.elastic.co/beats/filebeat:7.14.1
+
+docker run --net elknetwork --name=filebeat --volume="/var/data/docker-desktop/default/daemon-data/containers:/var/lib/docker/containers:ro" --volume="/var/run/docker.sock:/var/run/docker.sock:ro" docker.elastic.co/beats/filebeat:7.14.1 filebeat -e -strict.perms=false -E output.elasticsearch.hosts=["http://elasticsearch:9200"]
+
+
+
+docker run -p 9200:9200 -p 9300:9300 --name elasticsearch -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+
+docker run --name kibana --link elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:7.14.1
+
+docker run --link elasticsearch --link kibana --link logstash --name=filebeat --user=root --volume="C:/Users/Kaushal/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro" --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" --volume="/var/run/docker.sock:/var/run/docker.sock:ro" docker.elastic.co/beats/filebeat:7.14.1 filebeat -e --strict.perms=false -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
+
+docker run -it --link elasticsearch --link kibana docker.elastic.co/beats/filebeat:7.14.1 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"] 
+
+curl -L -O https://raw.githubusercontent.com/elastic/beats/8.3/deploy/docker/filebeat.docker.yml
+
+
+docker run --label co.elastic.logs/module=apache2 --label co.elastic.logs/fileset.stdout=access --label co.elastic.logs/fileset.stderr=error --label co.elastic.metrics/module=apache --label co.elastic.metrics/metricsets=status --label co.elastic.metrics/hosts='${data.host}:${data.port}' --detach=true --name my-apache-app -p 8081:80 httpd:2.4
+
+
+docker run --name springboot-with-elk -p 8081:8081 --link elasticsearch --link kibana --link logstash --filebeat springboot-with-elk
+
+docker network create -d bridge my-bridge
+
+docker network ls
+
+
+command to run docker image via bridge:
+
+docker run -p 9200:9200 -p 9300:9300 --name elasticsearch -itd --network my-bridge -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+
+docker run --name kibana -itd --network my-bridge -p 5601:5601 docker.elastic.co/kibana/kibana:7.14.1
+
+docker run -itd --network my-bridge docker.elastic.co/beats/filebeat:7.14.1 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
+curl -L -O  https://raw.githubusercontent.com/elastic/beats/8.3/deploy/docker/filebeat.docker.yml
+
+docker run -itd --network my-bridge --name=filebeat --user=root --volume="C:/Users/Kaushal/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro" --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" --volume="/var/run/docker.sock:/var/run/docker.sock:ro" docker.elastic.co/beats/filebeat:7.14.1 filebeat -e --strict.perms=false -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
+docker build -t springboot-with-elk .
+
+docker run --name springboot-with-elk -p 8081:8081 -itd --network my-bridge springboot-with-elk
+
+
+
+
+
